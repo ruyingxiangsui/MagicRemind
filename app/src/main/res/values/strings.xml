@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">通知提醒</string>
+    <string name="add">添加</string>
+    <string name="setting">开启</string>
+    <string name="menu_setting">设置</string>
+    <string name="tips">设置->辅助功能->无障碍->通知提醒，点击开启即可</string>
+    <string name="hint">输入需要提醒的文字</string>
+    <string name="title_content_empty">暂无过滤内容，可在下方添加</string>
+    <string name="title_content_not_empty">通知提醒列表</string>
+    <string name="read_me">使用说明</string>
+</resources>
