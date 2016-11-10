@@ -2,11 +2,14 @@ package com.example.leixiaowei.magicremind;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -63,20 +66,56 @@ public class NotificationService extends AccessibilityService {
                 .filter(list -> !isEmptyList(list))
                 .map(this::checkContainsRemindText)
                 .filter(aBoolean -> aBoolean)
-                .subscribe(action -> playAlarm(), throwable -> {
+                .subscribe(action -> remindMe(), throwable -> {
                     Log.e("handleNotification", "error");
                 });
     }
 
-    private void playAlarm() {
-        Ringtone ringtone = RingtoneManager.getRingtone(this, getSystemDefaultRingtoneUri());
-        ringtone.play();
+    private void remindMe() {
+        playAlarm();
+        vibrate();
     }
 
-    @Override
-    public void onDestroy() {
+    // 播放铃声
+    private void playAlarm() {
+        if (shouldAdjustRingVolume()) {
+            adjustVolume();
+        }
+        Ringtone ringtone = RingtoneManager.getRingtone(this, getSystemDefaultRingtoneUri());
+        if (!ringtone.isPlaying()) {
+            ringtone.play();
+        }
+    }
 
-        super.onDestroy();
+    // 是否需要调整音量
+    private boolean shouldAdjustRingVolume() {
+        AudioManager audioMgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int ringVolume = audioMgr.getStreamVolume(AudioManager.STREAM_RING);
+        return ringVolume == 0;
+    }
+
+    // 如果处于静音，调整音量
+    private void adjustVolume() {
+        AudioManager audioMgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = audioMgr.getStreamMaxVolume(AudioManager.STREAM_RING);
+        int targetVolume = (int) (maxVolume * 0.6);
+        audioMgr.setStreamVolume(AudioManager.STREAM_RING, targetVolume, AudioManager.FLAG_PLAY_SOUND);
+    }
+
+    // 是否需要震动 默认铃声音量最高音的%30时，开启震动
+    private boolean shouldVibrate() {
+        AudioManager audioMgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = audioMgr.getStreamMaxVolume(AudioManager.STREAM_RING);
+        int ringVolume = audioMgr.getStreamVolume(AudioManager.STREAM_RING);
+        return ringVolume < maxVolume * 0.3;
+    }
+
+    // 震动
+    private void vibrate() {
+        if (shouldVibrate()) {
+            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            vibrator.vibrate(5000);
+        }
     }
 
     //获取系统默认铃声的Uri
