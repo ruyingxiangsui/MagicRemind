@@ -40,7 +40,12 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".AppSettingActivity"></activity>
+        <activity android:name=".AppSettingActivity"
+            android:label="软件设置">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>
