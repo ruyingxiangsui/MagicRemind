@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="5dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:paddingTop="10dp">
+
+    <CheckBox
+        android:id="@+id/with_vibrate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_setting_with_vibrate"
+        android:textSize="14sp" />
+
+    <CheckBox
+        android:id="@+id/auto_adjust_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_setting_auto_adjust_volume"
+        android:layout_marginTop="5dp"
+        android:textSize="14sp" />
+</LinearLayout>

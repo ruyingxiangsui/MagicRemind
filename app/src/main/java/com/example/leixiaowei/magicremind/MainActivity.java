@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String READ_PAGE_URL = "http://ruyingxiangsui.github.io/magic_remind.htm";
+    private static final String READ_PAGE_URL = "https://ruyingxiangsui.github.io/magic_remind.htm";
 
     private LinearLayout settingLayout;
     private Button settingBtn;
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         settingLayout = (LinearLayout) findViewById(R.id.setting_layout);
         settingBtn = (Button) findViewById(R.id.set_remind);
-        settingBtn.setOnClickListener(v -> toSettingPage());
+        settingBtn.setOnClickListener(v -> toSystemSettingPage());
 
         Object object = RemindFileUtil.readObject(this);
         if (object instanceof RemindTable) {
@@ -70,16 +70,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void toSettingPage() {
-        Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        startActivity(intent);
-    }
-
-    private void toReadMePage() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(READ_PAGE_URL));
-        startActivity(intent);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -90,8 +80,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.setting:
-                toSettingPage();
+            case R.id.system_setting:
+                toSystemSettingPage();
+                break;
+            case R.id.app_setting:
+                toAppSettingPage();
                 break;
             case R.id.read_me:
                 toReadMePage();
@@ -100,6 +93,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    private void toSystemSettingPage() {
+        Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        startActivity(intent);
+    }
+
+    private void toAppSettingPage() {
+        startActivity(new Intent(this, AppSettingActivity.class));
+    }
+
+    private void toReadMePage() {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(READ_PAGE_URL));
+        startActivity(intent);
     }
 
     private void setContentTitle() {

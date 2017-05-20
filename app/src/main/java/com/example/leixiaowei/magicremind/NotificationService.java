@@ -23,6 +23,10 @@ import rx.Subscription;
 import rx.functions.Actions;
 import rx.subjects.PublishSubject;
 
+import static com.example.leixiaowei.magicremind.SettingsUtil.AUTO_ADJUST_VOLUME;
+import static com.example.leixiaowei.magicremind.SettingsUtil.WITH_VIBRATE;
+import static com.example.leixiaowei.magicremind.SettingsUtil.getSettingState;
+
 public class NotificationService extends AccessibilityService {
 
     public static final String SERVICE = "com.example.leixiaowei.magicremind.NotificationService";
@@ -99,7 +103,7 @@ public class NotificationService extends AccessibilityService {
     private boolean shouldAdjustRingVolume() {
         AudioManager audioMgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int ringVolume = audioMgr.getStreamVolume(AudioManager.STREAM_RING);
-        return ringVolume == 0;
+        return ringVolume == 0 && getSettingState(this, AUTO_ADJUST_VOLUME);
     }
 
     // 如果处于静音，调整音量
@@ -110,19 +114,16 @@ public class NotificationService extends AccessibilityService {
         audioMgr.setStreamVolume(AudioManager.STREAM_RING, targetVolume, AudioManager.FLAG_PLAY_SOUND);
     }
 
-    // 是否需要震动 默认铃声音量最高音的%30时，开启震动
+    // 是否需要震动
     private boolean shouldVibrate() {
-        AudioManager audioMgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = audioMgr.getStreamMaxVolume(AudioManager.STREAM_RING);
-        int ringVolume = audioMgr.getStreamVolume(AudioManager.STREAM_RING);
-        return ringVolume < maxVolume * 0.3;
+        return getSettingState(this, WITH_VIBRATE);
     }
 
     // 震动
     private void vibrate() {
         if (shouldVibrate()) {
             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            vibrator.vibrate(5000);
+            vibrator.vibrate(10000);
         }
     }
 
