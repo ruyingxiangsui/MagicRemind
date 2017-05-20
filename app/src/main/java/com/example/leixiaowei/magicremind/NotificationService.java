@@ -16,12 +16,23 @@ import android.view.accessibility.AccessibilityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Subscription;
+import rx.functions.Actions;
+import rx.subjects.PublishSubject;
 
 public class NotificationService extends AccessibilityService {
 
     public static final String SERVICE = "com.example.leixiaowei.magicremind.NotificationService";
+    PublishSubject<Integer> playSubject = PublishSubject.create();
+    Subscription subscription = playSubject.throttleFirst(30, TimeUnit.SECONDS).subscribe(__ -> {
+        Ringtone ringtone = RingtoneManager.getRingtone(this, getSystemDefaultRingtoneUri());
+        if (!ringtone.isPlaying()) {
+            ringtone.play();
+        }
+    }, Actions.empty());
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -81,10 +92,7 @@ public class NotificationService extends AccessibilityService {
         if (shouldAdjustRingVolume()) {
             adjustVolume();
         }
-        Ringtone ringtone = RingtoneManager.getRingtone(this, getSystemDefaultRingtoneUri());
-        if (!ringtone.isPlaying()) {
-            ringtone.play();
-        }
+        playSubject.onNext(0);
     }
 
     // 是否需要调整音量
@@ -174,5 +182,11 @@ public class NotificationService extends AccessibilityService {
                 .toBlocking()
                 .first();
 
+    }
+
+    @Override
+    public void onDestroy() {
+        subscription.unsubscribe();
+        super.onDestroy();
     }
 }
